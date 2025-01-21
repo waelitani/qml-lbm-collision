@@ -1,6 +1,6 @@
 # Towards Quantum Machine Learning of Collision Operators
 
-This code is to accompany the final chapter of my thesis. It facilitates the construction and training of quantum neural networks to act as lattice Boltzmann collision operators using the `PennyLane v0.37` and `PyTorch 2.4` libraries.
+This code is to accompany the final chapter of my thesis. It facilitates the construction and training of quantum neural networks to act as lattice Boltzmann collision operators using the [`PennyLane v0.37`](https://github.com/PennyLaneAI/pennylane) and [`PyTorch 2.4`](https://github.com/pytorch/pytorch) libraries.
 
 If you find this code useful, please cite:
 
