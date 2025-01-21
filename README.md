@@ -4,5 +4,5 @@ This code is to accompany the final chapter of my thesis. It facilitates the con
 
 If you find this code useful, please cite:
 
-**Itani, W. (2025). Towards a Quantum Algorithm for Lattice Boltzmann (QALB) Simulation with a Nonlinear Collision Term. New York University.**
+**Itani, W. (2024). Towards a Quantum Algorithm for Lattice Boltzmann (QALB) Simulation with a Nonlinear Collision Term. New York University.**
 
