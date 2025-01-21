@@ -1,0 +1,5 @@
+qnn = QNN(binary_precision = binary_precision)
+qnn.addEntanglingLayer(layers, 'index')
+qnn.addEntanglingLayer(layers, 'value')
+qnn.performControlledRotation()
+qnn.adjointNActions(2)

@@ -1,0 +1,4 @@
+qnn = QNN(binary_precision = binary_precision)
+for r in range(R):
+	qnn.addEntanglingLayer(layers, 'all')
+	qnn.performControlledRotation()

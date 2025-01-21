@@ -1,0 +1,2 @@
+qnn = QNN(binary_precision = binary_precision)
+qnn.addEntanglingLayer(layers, 'all')
