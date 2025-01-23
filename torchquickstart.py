@@ -1,6 +1,6 @@
 import os
 import torch
-torch.set_default_device('cpu')
+torch.set_default_device('cuda')
 
 def train(dataloader, model, loss_fn, optimizer, c, rank, world_size):
     
@@ -16,7 +16,7 @@ def train(dataloader, model, loss_fn, optimizer, c, rank, world_size):
        
         # Backpropagation        
         loss.backward(retain_graph = True)
-                
+        
         optimizer.step()
         
         loss, current = loss.item(), (batch + 1) * world_size*len(X)

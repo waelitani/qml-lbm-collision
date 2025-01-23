@@ -6,14 +6,14 @@ import hashlib
 from function_library import binaryAmplitude
 
 torch.set_default_dtype(torch.float64)
-torch.set_default_device('cpu')
+torch.set_default_device('cuda')
 
 class PreProcessingLayer(torch.nn.Module):
     def __init__(self, qc, prec):
-        super(PreProcessingLayer).__init__()
+        super(PreProcessingLayer,self).__init__()
         self.qc = qc
         self.prec = prec
-        self.lamb = binaryAmplitude
+        self.lambd = binaryAmplitude
         
     def forward(self, x):
         if self.prec == 1:
@@ -26,7 +26,6 @@ class PostProcessingLayer(torch.nn.Module):
         super(PostProcessingLayer, self).__init__()
         
         self.factors = factors
-        
         self.qc = qc
         self.prec = prec
 
@@ -166,7 +165,7 @@ class QNN:
         
         dev = qml.device(self.device,wires = self.qubits)
         
-        @qml.qnode(dev)
+        @qml.qnode(dev, interface = "torch", diff_method = "parameter-shift")
         def circuit(inputs,**kwargs):
             # Feature Map
             if skip_initialization is None:
@@ -198,7 +197,7 @@ class QNN:
                 
             return qml.probs(wires = self.indexWires+self.valueWires)
         
-        self.circuit = circuit
+        self.circuit = qml.transforms.broadcast_expand(circuit)
         
         return self.circuit
     
@@ -212,7 +211,7 @@ class QNN:
     # Pre-calculate the factors for binary conversion with a given binary precision
     def substringConversion(self):
         size = 2**(self.qc+self.prec)
-        factors = torch.zeros(size = (size,self.Q), device = "cpu")
+        factors = torch.zeros(size = (size,self.Q), device = "cuda")
         
         for s in range(size):
             st = np.binary_repr(s,self.qc+self.prec)
@@ -222,7 +221,7 @@ class QNN:
                     factors[s,q] = int(st[self.qc:],2)
                 else:
                     factors[s,q] = int(st[self.qc:],2)/2**self.prec
-
+        
         return factors
     
     def compileModel(self):
@@ -233,7 +232,7 @@ class QNN:
         factors = self.substringConversion()
         
         qlayer = self.compileLayer()
-        layers  = [PreProcessingLayer(self.qc,self.prec),qlayer,PostProcessingLayer(factors,self.qc,self.prec)]
+        layers  = [PreProcessingLayer(self.qc,self.prec),qlayer,PostProcessingLayer(self.qc,self.prec,factors)]
         self.model = torch.nn.Sequential(*layers)
         self.md5 = hashlib.md5(' \n'.join(self.string).encode()).hexdigest()
         return self.model, ' \n'.join(self.circ),' \n'.join(self.string),self.md5

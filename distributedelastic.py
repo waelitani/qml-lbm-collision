@@ -12,15 +12,12 @@ from torch.distributed.elastic.multiprocessing.errors import record
 
 from modularLayer import QNN
 
-torch.set_default_device('cpu')
+torch.set_default_device('cuda')
 torch.set_default_dtype(torch.float64)
 
 torch.autograd.set_detect_anomaly(True)
 torch.manual_seed(0)
 torch.set_grad_enabled(True)
-
-torch.set_num_interop_threads(2)
-torch.set_num_threads(2)
 
 from torchquickstart import train
 from corbetta import LB_stencil
@@ -56,7 +53,7 @@ def copy_file(source_file, destination_folder):
 
 def setup(rank: int, world_size: int):
     # Initialize the process group
-    torch.distributed.init_process_group(backend="gloo", world_size=world_size, rank=rank)
+    torch.distributed.init_process_group(backend="nccl", world_size=world_size, rank=rank)
 
 def cleanup():
     "Cleans up the distributed environment"
@@ -79,7 +76,7 @@ def load_snapshot(model, snapshot_path = "0"):
         print('Loading latest weights from '+snapshot_path)
         latest = max(glob.iglob(snapshot_path+'/*.pt'), key=os.path.getmtime)
         snapshot = torch.load(latest
-        ,  map_location=torch.device('cpu')
+        ,  map_location=torch.device('cuda')
         , weights_only = True)
         model.load_state_dict(snapshot["MODEL_STATE"], strict = False)
         epochs_run = snapshot["EPOCHS_RUN"]
@@ -113,8 +110,9 @@ def main(num_epochs, save_every, num_samples, batch_size, multiplier, learning_r
         
     print("Distributed:"+str(distributed))
     
-    model, circuit_instructions, circuit_construction, md5identifier = load_model(file_path)
-    
+    # model, circuit_instructions, circuit_construction, md5identifier, _ = load_model(file_path)
+    model, circuit_instructions, circuit_construction, md5identifier, _ = load_model(file_path, circuit_scope = {'binary_precision' : 2, 'layers' : 4})
+        
     str_name = md5identifier
     checkpoint_dir = "./"+str_name+"/"
     
@@ -148,17 +146,18 @@ def main(num_epochs, save_every, num_samples, batch_size, multiplier, learning_r
     
     train_loader = torch.utils.data.DataLoader(
     trainset
-    , shuffle= False
-    , sampler= train_sampler
+    # , shuffle= False
+    # , sampler= train_sampler
     , batch_size = batch_size
-    , pin_memory = False
+    # , pin_memory = False
+    ,generator=torch.Generator(device='cuda')
     )
     
     optimizer.zero_grad()
 
     # # Training Run
 
-    c = torch.tensor(c, device = 'cpu')
+    c = torch.tensor(c, device = 'cuda')
     
     if distributed:
         model = torch.nn.parallel.DistributedDataParallel(model)

@@ -6,8 +6,8 @@ to accompany the paper:
 Corbetta, A., Gabbana, A., Gyrya, V. et al. Toward learning Lattice Boltzmann collision operators. Eur. Phys. J. E 46, 10 (2023). https://doi.org/10.1140/epje/s10189-023-00267-w
 
 '''
-import numpy as np
 
+import numpy as np
 from corbetta import LB_stencil, compute_rho_u, compute_f_rand, compute_f_pre_f_post, compute_feq, delete_negative_samples
 
 #####################################
@@ -76,7 +76,7 @@ while idx < n_samples:
     rhoLst[ idx: idx1] = rho[ : to_be_added]
     
     idx = idx + non_negatives 
-    
+
 np.savez('example_dataset.npz', 
         f_pre  = fPreLst,
         f_post = fPostLst,

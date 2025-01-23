@@ -69,7 +69,7 @@ class D2Q9:
             fpre = np.swapaxes(f,0,2).reshape((int(tot_ny*tot_nx),9))
             # Perform the quantum collision and return the values
             with torch.no_grad():
-                fpost = self.qmodel(torch.tensor(fpre, device = 'cpu'))
+                fpost = self.qmodel(torch.tensor(fpre, device = 'cuda'))
 
             # Reshape the array into its original shape
             fpost = np.array(fpost)

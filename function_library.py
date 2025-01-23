@@ -1,13 +1,11 @@
 # Import the necessary libraries
-from catalyst import qjit
-
 import os
 import numpy as np
 import pennylane as qml
 
 import torch 
 torch.set_default_dtype(torch.float64)
-torch.set_default_device('cpu')
+torch.set_default_device('cuda')
 
 from corbetta import LB_stencil, load_data
 
@@ -15,7 +13,7 @@ from corbetta import LB_stencil, load_data
 c, _, _ = LB_stencil()
 D = 2
 Q = 9
-c = torch.tensor(data = c, dtype = torch.float64, device = "cpu")
+c = torch.tensor(data = c, dtype = torch.float64, device = "cuda")
 
 class Dataset(torch.utils.data.Dataset):
   def __init__(self, X,y):
@@ -76,7 +74,7 @@ def dataLoad(qc, num_samples, test_size = 0.1, truncate = False, binary_precisio
     if truncate:
         fpost = np.around(fpost, decimals = int(np.floor(binary_precision*np.log(2)/np.log(10))))
     # Calculate the exact output values in the binary precision used for encoding for a fair comparison
-    return Dataset(torch.tensor(fpre,requires_grad = True, device = "cpu"),torch.tensor(fpost,requires_grad = True, device = "cpu"))
+    return Dataset(torch.tensor(fpre,requires_grad = True, device = "cuda"),torch.tensor(fpost,requires_grad = True, device = "cuda"))
     
 # Calculate the momentum
 def calculate_u(f,c):
@@ -112,11 +110,11 @@ def binaryAmplitude(f, qc = 4, binary_precision = 8):
     num_vars = int(f.shape[1])
     bin_prec = int(binary_precision)
 
-    outset = torch.zeros(size = (num_samples,2**(qc+bin_prec)))
+    outset = torch.zeros(size = (num_samples,2**(qc+bin_prec)), device = 'cuda')
 
     for s in range(num_samples):
         for q in range(num_vars):
             id = int(np.binary_repr(q,qc)+float_bin(f[s][q],bin_prec),2)
             outset[s][id] = 1
 
-    return outset.clone().detach().requires_grad_(True)
+    return outset

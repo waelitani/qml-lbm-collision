@@ -9,7 +9,7 @@ Corbetta, A., Gabbana, A., Gyrya, V. et al. Toward learning Lattice Boltzmann co
 
 # Import the necessary libraries
 import numpy as np
-from numba import jit
+# from numba import jit
 
 # Load the pre- and post- collision discrete density sample dataset from the .npz file
 def load_data(fname):
@@ -91,7 +91,7 @@ def delete_negative_samples(n_samples, f_eq, f_pre, f_post):
     
     return f_eq, f_pre, f_post
 
-@jit
+# @jit
 def LB_stencil():
     
     ###########################################################
@@ -116,7 +116,7 @@ def LB_stencil():
     return c, w, cs2
 
 # Function for the calculation of the equilibrium
-@jit
+# @jit
 def compute_feq(feq, rho, ux, uy, Q):
     c, w, cs2 = LB_stencil()
     uu = (ux**2 + uy**2)*(1./cs2)
