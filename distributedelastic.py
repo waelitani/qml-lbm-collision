@@ -12,7 +12,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 
 from modularLayer import QNN
 
-torch.set_default_device('cuda')
+torch.set_default_device('cpu')
 torch.set_default_dtype(torch.float64)
 
 torch.autograd.set_detect_anomaly(True)
@@ -53,7 +53,7 @@ def copy_file(source_file, destination_folder):
 
 def setup(rank: int, world_size: int):
     # Initialize the process group
-    torch.distributed.init_process_group(backend="nccl", world_size=world_size, rank=rank)
+    torch.distributed.init_process_group(backend="gloo", world_size=world_size, rank=rank)
 
 def cleanup():
     "Cleans up the distributed environment"
@@ -76,7 +76,7 @@ def load_snapshot(model, snapshot_path = "0"):
         print('Loading latest weights from '+snapshot_path)
         latest = max(glob.iglob(snapshot_path+'/*.pt'), key=os.path.getmtime)
         snapshot = torch.load(latest
-        ,  map_location=torch.device('cuda')
+        ,  map_location=torch.device('cpu')
         , weights_only = True)
         model.load_state_dict(snapshot["MODEL_STATE"], strict = False)
         epochs_run = snapshot["EPOCHS_RUN"]
@@ -146,18 +146,17 @@ def main(num_epochs, save_every, num_samples, batch_size, multiplier, learning_r
     
     train_loader = torch.utils.data.DataLoader(
     trainset
-    # , shuffle= False
-    # , sampler= train_sampler
+    , shuffle= False
+    , sampler= train_sampler
     , batch_size = batch_size
-    # , pin_memory = False
-    ,generator=torch.Generator(device='cuda')
+    , pin_memory = False
     )
     
     optimizer.zero_grad()
 
     # # Training Run
 
-    c = torch.tensor(c, device = 'cuda')
+    c = torch.tensor(c, device = 'cpu')
     
     if distributed:
         model = torch.nn.parallel.DistributedDataParallel(model)

@@ -1,6 +1,6 @@
 import os
 import torch
-torch.set_default_device('cuda')
+torch.set_default_device('cpu')
 
 def train(dataloader, model, loss_fn, optimizer, c, rank, world_size):
     

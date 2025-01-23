@@ -6,7 +6,7 @@ import hashlib
 from function_library import binaryAmplitude
 
 torch.set_default_dtype(torch.float64)
-torch.set_default_device('cuda')
+torch.set_default_device('cpu')
 
 class PreProcessingLayer(torch.nn.Module):
     def __init__(self, qc, prec):
@@ -211,7 +211,7 @@ class QNN:
     # Pre-calculate the factors for binary conversion with a given binary precision
     def substringConversion(self):
         size = 2**(self.qc+self.prec)
-        factors = torch.zeros(size = (size,self.Q), device = "cuda")
+        factors = torch.zeros(size = (size,self.Q), device = "cpu")
         
         for s in range(size):
             st = np.binary_repr(s,self.qc+self.prec)
