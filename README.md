@@ -1,6 +1,6 @@
 # Towards Quantum Machine Learning of Collision Operators
 
-This code is to accompany the final chapter of my thesis. It facilitates the construction and training of quantum neural networks to act as lattice Boltzmann collision operators using the [`PennyLane v0.37`](https://github.com/PennyLaneAI/pennylane) and [`PyTorch 2.4`](https://github.com/pytorch/pytorch) libraries.
+This code is to accompany the final chapter of my thesis. It facilitates the construction and training of quantum neural networks to act as lattice Boltzmann collision operators using the [`PennyLane v0.37`](https://github.com/PennyLaneAI/pennylane) and [`PyTorch 2.4`](https://github.com/pytorch/pytorch) libraries. The code has been tested for compatiblity up to PennyLane v0.40 and PyTorch 2.5.1.
 
 If you find this code useful, please cite:
 
@@ -23,7 +23,7 @@ The D8 transforms and their implementation into the quantum circuit are also def
 ## Training Run (distributedelastic.py, torchquickstart.py, utils.py)
 The files defining the overall training process, training loop and necessary assisting functions are defined in the above files respectively. The training is designed to run on a CPU cluster, and is executed with `torchrun` on the file containing the `main` function with appropriate arguments, e.g.:
 ```
-torchrun distributedelastic.py --ne 10 --se 1 --ns 128 --bs 32 --fl circuit_library/SEL-CRY-Inverse-SEL/
+torchrun distributedelastic.py --ne 10 --se 1 --ns 128 --bs 32 --fl circuit_library/SEL-CRY-Inverse-SEL
 ```
 The arguments accepted could be found in the `main` function definition.
 
